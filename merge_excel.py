@@ -20,6 +20,11 @@ def to_excel(df):
     # index=False prevents pandas from writing row indices to the file.
     with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
         df.to_excel(writer, index=False, sheet_name='MergedData')
+        
+        # Set the worksheet to right-to-left
+        worksheet = writer.sheets['MergedData']
+        worksheet.right_to_left()
+
     processed_data = output.getvalue()
     return processed_data
 
@@ -30,14 +35,23 @@ st.write(
     "The app will merge them into a single downloadable file."
 )
 
+# Enable a button to remove all uploaded files
+if "uploader_key" not in st.session_state:
+    st.session_state["uploader_key"] = 1
+    
 # 1. File Uploader
 uploaded_files = st.file_uploader(
     "Choose Excel files (.xlsx)",
-    type=['xlsx'],
-    accept_multiple_files=True
+    type=['xlsx', 'xls'],
+    accept_multiple_files=True,
+    key=st.session_state["uploader_key"]
 )
 
 
+if st.button("Clear all files"):
+    # st.session_state.uploaded_files = []
+    st.session_state["uploader_key"] += 1
+    st.rerun()   # Refresh the app so uploader resets
 
 
 # 2. Processing and Download Logic
@@ -52,10 +66,10 @@ if uploaded_files:
     for file in uploaded_files:
         try:
             # Read the Excel file into a DataFrame
-            excel_dfs = pd.read_excel(file, sheet_name=None)
+            excel_dfs = pd.read_excel(file, sheet_name=None, header=None)
             for sheet_name, df in excel_dfs.items():
                 df = df.dropna(axis=0, how='all')
-
+                print(df.head())
                 # Add a source column to track which file the data came from
                 # df['Source_File'] = filename        
                 df_list.append(df)
