@@ -152,8 +152,8 @@ if "uploader_key" not in st.session_state:
 # 1. File Uploader
 if option == "איחוד קבצי אקסל":
     uploaded_files = st.file_uploader(
-        "בחר קבצי אקסל (.xlsx, .xls)",
-        type=['xlsx', 'xls'],
+        "בחר קבצי אקסל (.xlsx, .xls, .xlsm)",
+        type=['xlsx', 'xls', 'xlsm'],
         accept_multiple_files=True,
         key=st.session_state['uploader_key']
     )
